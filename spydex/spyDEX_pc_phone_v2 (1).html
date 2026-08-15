@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SPYDEX SPIDER</title>
+
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    background:
+    radial-gradient(circle at center,#300000,#080808 55%,#020202);
+    color:white;
+    font-family:Arial,sans-serif;
+    min-height:100vh;
+    overflow:hidden;
+}
+
+body:before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background-image:
+    linear-gradient(#ff00000b 1px,transparent 1px),
+    linear-gradient(90deg,#ff00000b 1px,transparent 1px);
+    background-size:40px 40px;
+    pointer-events:none;
+}
+
+header{
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    padding:20px;
+    display:flex;
+    justify-content:space-between;
+    z-index:10;
+}
+
+.logo{
+    color:#ff2222;
+    font-size:20px;
+    font-weight:bold;
+    letter-spacing:4px;
+    text-shadow:0 0 15px red;
+}
+
+.status{
+    font-size:11px;
+    color:#777;
+}
+
+.status span{
+    color:#ff2222;
+}
+
+/* ANA */
+
+.main{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+}
+
+/* ORB */
+
+.orbBox{
+    width:280px;
+    height:280px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    position:relative;
+}
+
+.orb{
+    width:125px;
+    height:125px;
+    border-radius:50%;
+
+    background:
+    radial-gradient(
+        circle at 35% 30%,
+        white 0%,
+        #ffcccc 5%,
+        #ff2020 25%,
+        #a00000 50%,
+        #300000 75%,
+        #000 100%
+    );
+
+    box-shadow:
+    0 0 20px red,
+    0 0 60px red,
+    0 0 120px #ff000066;
+
+    animation:pulse 3s infinite ease-in-out;
+}
+
+.orbit{
+    position:absolute;
+    width:270px;
+    height:100px;
+    border:1px solid #ff000066;
+    border-radius:50%;
+    transform:rotate(25deg);
+    animation:rotate 7s linear infinite;
+}
+
+.orbit2{
+    position:absolute;
+    width:270px;
+    height:100px;
+    border:1px solid #ff000044;
+    border-radius:50%;
+    transform:rotate(-55deg);
+    animation:rotate 10s linear infinite reverse;
+}
+
+@keyframes rotate{
+    from{transform:rotate(0)}
+    to{transform:rotate(360deg)}
+}
+
+@keyframes pulse{
+    0%,100%{
+        transform:scale(1);
+    }
+
+    50%{
+        transform:scale(1.08);
+    }
+}
+
+.listening .orb{
+    animation:listen .5s infinite alternate;
+}
+
+@keyframes listen{
+    from{
+        transform:scale(1);
+    }
+
+    to{
+        transform:scale(1.18);
+    }
+}
+
+/* YAZI */
+
+.title{
+    margin-top:10px;
+    font-size:30px;
+    letter-spacing:7px;
+    text-shadow:0 0 15px red;
+}
+
+.subtitle{
+    color:#666;
+    font-size:10px;
+    letter-spacing:3px;
+    margin-top:8px;
+}
+
+.response{
+    margin-top:25px;
+    width:90%;
+    max-width:700px;
+    text-align:center;
+    min-height:30px;
+    color:#ddd;
+}
+
+/* BUTON */
+
+.mic{
+    margin-top:25px;
+    width:70px;
+    height:70px;
+    border-radius:50%;
+    border:2px solid red;
+    background:#300000;
+    color:white;
+    font-size:25px;
+    cursor:pointer;
+    box-shadow:0 0 25px #ff000077;
+}
+
+.mic:hover{
+    background:#900000;
+}
+
+.mic.active{
+    background:red;
+    box-shadow:0 0 50px red;
+}
+
+/* QR */
+
+.qrPanel{
+    position:fixed;
+    right:25px;
+    bottom:25px;
+    width:190px;
+    padding:15px;
+    background:#090909dd;
+    border:1px solid #ff000055;
+    border-radius:12px;
+    text-align:center;
+    backdrop-filter:blur(10px);
+}
+
+.qrPanel h3{
+    font-size:12px;
+    color:#ff2222;
+    letter-spacing:2px;
+    margin-bottom:10px;
+}
+
+#qrcode{
+    background:white;
+    padding:8px;
+    width:max-content;
+    margin:auto;
+}
+
+.qrText{
+    margin-top:10px;
+    color:#777;
+    font-size:9px;
+}
+
+.peerID{
+    margin-top:7px;
+    font-size:8px;
+    color:#ff4444;
+    word-break:break-all;
+}
+
+/* TELEFON MODU */
+
+.phone{
+    overflow:auto;
+    background:
+    radial-gradient(circle at top,#350000,#080808 60%);
+}
+
+.phone .main{
+    min-height:100vh;
+    padding:30px 20px;
+}
+
+.phone .orbBox{
+    width:220px;
+    height:220px;
+}
+
+.phone .orb{
+    width:100px;
+    height:100px;
+}
+
+.phone .orbit,
+.phone .orbit2{
+    width:210px;
+}
+
+.phone .title{
+    font-size:24px;
+}
+
+.remoteBox{
+    width:100%;
+    max-width:450px;
+    margin-top:25px;
+}
+
+.input{
+    width:100%;
+    height:52px;
+    border-radius:10px;
+    border:1px solid #ff000055;
+    background:#120000;
+    color:white;
+    padding:0 15px;
+    outline:none;
+}
+
+.send{
+    width:100%;
+    height:52px;
+    margin-top:10px;
+    border:0;
+    border-radius:10px;
+    background:#b00000;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.send:hover{
+    background:red;
+}
+
+.phoneMic{
+    width:75px;
+    height:75px;
+    margin:20px auto;
+    display:block;
+    border-radius:50%;
+    border:2px solid red;
+    background:#300000;
+    color:white;
+    font-size:28px;
+}
+
+.connection{
+    text-align:center;
+    color:#777;
+    font-size:11px;
+    margin-top:10px;
+}
+
+@media(max-width:700px){
+
+    .qrPanel{
+        display:none;
+    }
+
+    .logo{
+        font-size:15px;
+    }
+
+}
+
+
+/* SPYDEX CONNECTION LAYER */
+
+.pairingCode{
+    margin-top:10px;
+    font-size:18px;
+    font-weight:700;
+    letter-spacing:5px;
+    color:#fff;
+    text-shadow:0 0 12px red;
+}
+
+.pairingHint{
+    margin-top:5px;
+    color:#666;
+    font-size:8px;
+}
+
+.phone .pairBox{
+    width:100%;
+    max-width:450px;
+    margin-top:20px;
+    padding:16px;
+    border:1px solid #ff000044;
+    border-radius:14px;
+    background:#090909cc;
+    text-align:center;
+}
+
+.pinInput{
+    width:100%;
+    height:52px;
+    margin-top:10px;
+    border:1px solid #ff000055;
+    border-radius:10px;
+    background:#120000;
+    color:white;
+    text-align:center;
+    font-size:22px;
+    letter-spacing:6px;
+    outline:none;
+}
+
+.pinButton{
+    width:100%;
+    height:48px;
+    margin-top:10px;
+    border:0;
+    border-radius:10px;
+    background:#a90000;
+    color:#fff;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.pinButton:hover{ background:red; }
+
+.connectionDot{
+    display:inline-block;
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:#666;
+    margin-right:6px;
+    box-shadow:0 0 8px #666;
+}
+
+.connectionDot.online{
+    background:#20ff55;
+    box-shadow:0 0 12px #20ff55;
+}
+
+.remoteMessage{
+    margin-top:10px;
+    min-height:18px;
+    color:#aaa;
+    font-size:10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+<div class="logo">
+SPYDEX // SPIDER
+</div>
+
+<div class="status">
+SYSTEM:
+<span id="status">ONLINE</span>
+</div>
+
+</header>
+
+
+<main class="main">
+
+<div class="orbBox">
+
+<div class="orbit"></div>
+<div class="orbit2"></div>
+<div class="orb"></div>
+
+</div>
+
+<div class="title">
+S.P.Y.D.E.X
+</div>
+
+<div class="subtitle">
+SPIDER INTELLIGENCE SYSTEM
+</div>
+
+<div id="response" class="response">
+Sistem hazır efendim.
+</div>
+
+<button id="mic" class="mic">
+🎙️
+</button>
+
+</main>
+
+
+<!-- QR PANEL -->
+
+<div class="qrPanel" id="qrPanel">
+
+<h3>
+📱 TELEFON BAĞLANTISI
+</h3>
+
+<div id="qrcode"></div>
+
+<div class="qrText">
+Telefonundan QR kodu okut
+</div>
+
+<div class="peerID" id="peerID">
+Bağlantı hazırlanıyor...
+</div>
+<div class="pairingCode" id="pairingCode">------</div>
+<div class="pairingHint">Telefon QR'ı okuttuktan sonra bu PIN'i girsin</div>
+
+</div>
+
+
+
+<script>
+/* =========================================================
+   SPYDEX CONNECTION CORE
+   PC <-> PHONE / QR + PIN / TWO-WAY MESSAGES
+========================================================= */
+
+const params = new URLSearchParams(window.location.search);
+const remoteID = params.get("remote");
+
+let peer = null;
+let connection = null;
+let authenticated = false;
+let pairingPIN = null;
+
+/* ---------- UI ---------- */
+
+function setStatus(text, online=false){
+    const el = document.getElementById("status");
+    if(el) el.innerText = text;
+    const dot = document.getElementById("connectionDot");
+    if(dot) dot.classList.toggle("online", online);
+}
+
+function show(text){
+    const el = document.getElementById("response");
+    if(el) el.innerText = text;
+}
+
+function speak(text){
+    if(!("speechSynthesis" in window)) return;
+    speechSynthesis.cancel();
+    const voice = new SpeechSynthesisUtterance(text);
+    voice.lang = "tr-TR";
+    voice.rate = .95;
+    voice.pitch = .85;
+    voice.volume = 1;
+    speechSynthesis.speak(voice);
+}
+
+function say(text, sendToPhone=true){
+    show(text);
+    speak(text);
+
+    if(sendToPhone && connection && connection.open && authenticated){
+        connection.send({
+            type:"response",
+            text:text,
+            time:Date.now()
+        });
+    }
+}
+
+function makePIN(){
+    return String(Math.floor(100000 + Math.random() * 900000));
+}
+
+/* ---------- COMMANDS ---------- */
+
+function command(raw){
+    const c = String(raw || "").toLowerCase().trim();
+    console.log("SPYDEX COMMAND:", c);
+
+    if(!c) return;
+
+    if(c.includes("merhaba") || c.includes("selam")){
+        say("Merhaba efendim. Sizi dinliyorum.");
+        return;
+    }
+
+    if(c.includes("nasılsın") || c.includes("nasilsin")){
+        say("Tüm sistemler normal çalışıyor efendim.");
+        return;
+    }
+
+    if(c.includes("saat kaç") || c.includes("saat kact")){
+        const time = new Date().toLocaleTimeString("tr-TR", {
+            hour:"2-digit", minute:"2-digit"
+        });
+        say("Şu an saat " + time + " efendim.");
+        return;
+    }
+
+    if(c.includes("tarih")){
+        const date = new Date().toLocaleDateString("tr-TR", {
+            weekday:"long", year:"numeric", month:"long", day:"numeric"
+        });
+        say("Bugün " + date + " efendim.");
+        return;
+    }
+
+    if(c.includes("google")){
+        say("Google açılıyor efendim.");
+        setTimeout(() => window.open("https://www.google.com","_blank"), 700);
+        return;
+    }
+
+    if(c.includes("youtube")){
+        say("YouTube açılıyor efendim.");
+        setTimeout(() => window.open("https://www.youtube.com","_blank"), 700);
+        return;
+    }
+
+    if(c.includes("instagram")){
+        say("Instagram açılıyor efendim.");
+        setTimeout(() => window.open("https://www.instagram.com","_blank"), 700);
+        return;
+    }
+
+    if(c.includes("spydex") || c.includes("spider") || c.includes("örümcek")){
+        say("SPYDEX sistemi aktif efendim.");
+        return;
+    }
+
+    say("Bu komutu henüz öğrenmedim efendim.");
+}
+
+/* ---------- PC MODE ---------- */
+
+function initPC(){
+
+    pairingPIN = makePIN();
+
+    peer = new Peer();
+
+    peer.on("open", id => {
+
+        const peerID = document.getElementById("peerID");
+        if(peerID) peerID.innerText = "ID: " + id;
+
+        const pin = document.getElementById("pairingCode");
+        if(pin) pin.innerText = pairingPIN;
+
+        const qr = document.getElementById("qrcode");
+        if(qr){
+            qr.innerHTML = "";
+            const url =
+                window.location.origin +
+                window.location.pathname +
+                "?remote=" + encodeURIComponent(id);
+
+            new QRCode(qr,{
+                text:url,
+                width:150,
+                height:150
+            });
+        }
+
+        setStatus("WAITING", false);
+        show("Telefon bağlantısı bekleniyor...");
+    });
+
+    peer.on("connection", conn => {
+
+        /* Only one controller at a time. */
+        if(connection && connection.open){
+            conn.close();
+            return;
+        }
+
+        connection = conn;
+        authenticated = false;
+        setStatus("AUTH...", false);
+        show("Telefon bağlantısı alındı. PIN bekleniyor...");
+
+        conn.on("open", () => {
+            conn.send({
+                type:"pin_required"
+            });
+        });
+
+        conn.on("data", data => {
+
+            if(!data || typeof data !== "object"){
+                return;
+            }
+
+            if(data.type === "auth"){
+                if(String(data.pin) === String(pairingPIN)){
+                    authenticated = true;
+
+                    conn.send({
+                        type:"auth_ok",
+                        message:"SPYDEX bağlantısı onaylandı."
+                    });
+
+                    setStatus("CONNECTED", true);
+                    show("Telefon SPYDEX'e bağlandı.");
+                    speak("Telefon bağlantısı kuruldu efendim.");
+                }else{
+                    conn.send({
+                        type:"auth_fail",
+                        message:"PIN hatalı."
+                    });
+                    show("Hatalı PIN ile bağlantı denemesi.");
+                    setStatus("WAITING", false);
+                }
+                return;
+            }
+
+            if(data.type === "command" && authenticated){
+                show("📱 › " + data.text);
+                command(data.text);
+                return;
+            }
+
+            if(data.type === "ping" && authenticated){
+                conn.send({
+                    type:"pong",
+                    time:Date.now()
+                });
+                return;
+            }
+        });
+
+        conn.on("close", () => {
+            authenticated = false;
+            connection = null;
+            setStatus("WAITING", false);
+            show("Telefon bağlantısı kesildi.");
+        });
+
+        conn.on("error", err => {
+            console.error(err);
+            authenticated = false;
+            setStatus("ERROR", false);
+        });
+    });
+
+    peer.on("disconnected", () => setStatus("RECONNECTING", false));
+
+    peer.on("error", err => {
+        console.error("PeerJS:", err);
+        setStatus("ERROR", false);
+        show("Bağlantı servisi hatası: " + err.type);
+    });
+
+    /* PC microphone */
+    const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if(SpeechRecognition){
+        const recognition = new SpeechRecognition();
+        recognition.lang = "tr-TR";
+        recognition.continuous = false;
+        recognition.interimResults = false;
+
+        document.getElementById("mic").onclick = () => {
+            try{
+                recognition.start();
+                document.getElementById("status").innerText = "LISTENING";
+                document.getElementById("mic").classList.add("active");
+                document.querySelector(".main").classList.add("listening");
+                show("Sizi dinliyorum efendim...");
+            }catch(e){}
+        };
+
+        recognition.onresult = e => {
+            const text = e.results[0][0].transcript;
+            show("› " + text);
+            command(text);
+        };
+
+        recognition.onend = () => {
+            document.getElementById("mic").classList.remove("active");
+            document.querySelector(".main").classList.remove("listening");
+            setStatus(
+                authenticated ? "CONNECTED" : "WAITING",
+                authenticated
+            );
+        };
+
+        recognition.onerror = () => {
+            document.getElementById("mic").classList.remove("active");
+            document.querySelector(".main").classList.remove("listening");
+            setStatus(
+                authenticated ? "CONNECTED" : "WAITING",
+                authenticated
+            );
+        };
+    }
+}
+
+/* ---------- PHONE MODE ---------- */
+
+function initPhone(){
+
+    document.body.classList.add("phone");
+
+    const qrPanel = document.getElementById("qrPanel");
+    if(qrPanel) qrPanel.style.display = "none";
+
+    const main = document.querySelector(".main");
+
+    const remoteBox = document.createElement("div");
+    remoteBox.className = "remoteBox";
+
+    remoteBox.innerHTML = `
+        <input id="textCommand"
+               class="input"
+               placeholder="SPYDEX'e komut yaz...">
+
+        <button id="sendButton" class="send">
+            KOMUT GÖNDER
+        </button>
+
+        <button id="phoneMic" class="phoneMic">
+            🎙️
+        </button>
+
+        <div class="connection">
+            <span id="connectionDot" class="connectionDot"></span>
+            <span id="phoneConnectionText">PC'ye bağlanılıyor...</span>
+        </div>
+
+        <div class="pairBox" id="pairBox">
+            <div>🔐 SPYDEX PIN</div>
+            <input id="pinInput"
+                   class="pinInput"
+                   inputmode="numeric"
+                   maxlength="6"
+                   placeholder="------">
+            <button id="pinButton" class="pinButton">
+                EŞLEŞTİR
+            </button>
+            <div class="remoteMessage" id="remoteMessage"></div>
+        </div>
+    `;
+
+    main.appendChild(remoteBox);
+
+    const pairBox = document.getElementById("pairBox");
+
+    peer = new Peer();
+
+    peer.on("open", () => {
+
+        connection = peer.connect(remoteID, {
+            reliable:true
+        });
+
+        connection.on("open", () => {
+            setStatus("PAIRING", false);
+            document.getElementById("phoneConnectionText").innerText =
+                "PC bağlantısı kuruldu • PIN bekleniyor";
+        });
+
+        connection.on("data", data => {
+
+            if(!data || typeof data !== "object") return;
+
+            if(data.type === "pin_required"){
+                pairBox.style.display = "block";
+                document.getElementById("remoteMessage").innerText =
+                    "PC'deki 6 haneli PIN'i gir.";
+                return;
+            }
+
+            if(data.type === "auth_ok"){
+                authenticated = true;
+                pairBox.style.display = "none";
+                setStatus("CONNECTED", true);
+                document.getElementById("phoneConnectionText").innerText =
+                    "PC BAĞLANTISI AKTİF";
+                show("🟢 " + data.message);
+                return;
+            }
+
+            if(data.type === "auth_fail"){
+                authenticated = false;
+                document.getElementById("remoteMessage").innerText =
+                    "❌ PIN hatalı.";
+                setStatus("PIN ERROR", false);
+                return;
+            }
+
+            if(data.type === "response"){
+                show("🕷️ " + data.text);
+                return;
+            }
+
+            if(data.type === "pong"){
+                return;
+            }
+        });
+
+        connection.on("close", () => {
+            authenticated = false;
+            setStatus("OFFLINE", false);
+            document.getElementById("phoneConnectionText").innerText =
+                "PC BAĞLANTISI KESİLDİ";
+        });
+
+        connection.on("error", err => {
+            console.error(err);
+            setStatus("ERROR", false);
+        });
+    });
+
+    peer.on("error", err => {
+        console.error(err);
+        setStatus("ERROR", false);
+        document.getElementById("phoneConnectionText").innerText =
+            "PC bulunamadı";
+    });
+
+    /* PIN */
+    document.getElementById("pinButton").onclick = () => {
+
+        const pin = document.getElementById("pinInput").value.trim();
+
+        if(pin.length !== 6){
+            document.getElementById("remoteMessage").innerText =
+                "6 haneli PIN gir.";
+            return;
+        }
+
+        if(!connection || !connection.open){
+            document.getElementById("remoteMessage").innerText =
+                "PC bağlantısı hazır değil.";
+            return;
+        }
+
+        connection.send({
+            type:"auth",
+            pin:pin
+        });
+
+        document.getElementById("remoteMessage").innerText =
+            "PIN doğrulanıyor...";
+    };
+
+    /* Text command */
+    function sendPhoneCommand(){
+
+        const input = document.getElementById("textCommand");
+        const text = input.value.trim();
+
+        if(!text) return;
+
+        if(!authenticated){
+            show("Önce PIN ile eşleştir.");
+            return;
+        }
+
+        connection.send({
+            type:"command",
+            text:text,
+            time:Date.now()
+        });
+
+        show("📱 › " + text);
+        input.value = "";
+    }
+
+    document.getElementById("sendButton").onclick = sendPhoneCommand;
+
+    document.getElementById("textCommand").addEventListener("keydown", e => {
+        if(e.key === "Enter") sendPhoneCommand();
+    });
+
+    /* Phone microphone */
+    const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if(SpeechRecognition){
+
+        const recognition = new SpeechRecognition();
+        recognition.lang = "tr-TR";
+        recognition.continuous = false;
+        recognition.interimResults = false;
+
+        document.getElementById("phoneMic").onclick = () => {
+
+            if(!authenticated){
+                show("Önce PIN ile eşleştir.");
+                return;
+            }
+
+            try{
+                recognition.start();
+                show("🎙️ Dinliyorum...");
+                document.getElementById("phoneMic").classList.add("active");
+            }catch(e){}
+        };
+
+        recognition.onresult = e => {
+
+            const text = e.results[0][0].transcript;
+
+            if(connection && connection.open && authenticated){
+                connection.send({
+                    type:"command",
+                    text:text,
+                    time:Date.now()
+                });
+            }
+
+            show("📱 › " + text);
+        };
+
+        recognition.onend = () => {
+            document.getElementById("phoneMic").classList.remove("active");
+        };
+    }
+}
+
+/* ---------- START ---------- */
+
+if(remoteID){
+    initPhone();
+}else{
+    initPC();
+}
+</script>
+
+
+</body>
+</html>
